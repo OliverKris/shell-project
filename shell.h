@@ -1,8 +1,8 @@
-// Standard C library headers
-#include <malloc.h>
-#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <stdlib.h>
-#include <sys/types.h>
+#include <stdio.h>
+#include <string.h>
 
 // Define constants for the shell program
 #define LSH_RL_BUFSIZE 1024
@@ -13,4 +13,10 @@
 void lsh_loop(void);
 char *lsh_read_line(void);
 char **lsh_splint_line(char *line);
+int lsh_launch(char **args);
 int lsh_execute(char **args);
+
+// Shell specific commands
+int lsh_cd(char **args);
+int lsh_help(char **args);
+int lsh_exit(char **args);
