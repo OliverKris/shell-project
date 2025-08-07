@@ -1,4 +1,5 @@
 #include "shell.h"
+#include "history.h"
 
 void lsh_loop(void) {
     /**
@@ -40,6 +41,15 @@ char *lsh_read_line(void) { // Implementation of getline() in the C standard lib
 
         if (c == EOF || c == '\n') {
             buffer[position] = '\0'; // Null-terminate the buffer
+            if (history_count < HISTORY_SIZE) {
+                history[history_count++] = strdup(buffer); // Add to history
+            } else {
+                free(history[0]); // Remove the oldest command if history is full
+                for (int i = 1; i < HISTORY_SIZE; i++) {
+                    history[i - 1] = history[i];
+                }
+                history[HISTORY_SIZE - 1] = strdup(buffer); // Add new command
+            }
             return buffer;
         } else {
             buffer[position] = c;
@@ -131,14 +141,16 @@ int lsh_launch(char **args) {
 char *builtin_str[] = {
     "cd",
     "help",
-    "exit"
+    "exit",
+    "history"
 };
 
 // Command to map the builtin commands to their respective functions
 int (*builtin_func[]) (char **) = {
     &lsh_cd,
     &lsh_help,
-    &lsh_exit
+    &lsh_exit,
+    &lsh_history
 };
 
 int lsh_num_builtins() {
@@ -198,4 +210,12 @@ int lsh_help(char **args) {
 
 int lsh_exit(char **args) {
     return 0; // Return 0 to indicate exit
+}
+
+int lsh_history(char **args) {
+    int i;
+    for(i = 0; i < history_count; i++){
+        printf("%d %s\n", i + 1, history[i]);
+    }
+    return 1;
 }
