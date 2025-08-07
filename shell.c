@@ -13,7 +13,7 @@ void lsh_loop(void) {
     do {
         printf("> ");
         line = lsh_read_line(); // Read
-        args = lsh_splint_line(line); // Parse
+        args = lsh_split_line(line); // Parse
         status = lsh_execute(args); // Execute
     } while (status); // Easy way to keep the shell running and exiting when needed
 }
@@ -110,7 +110,7 @@ int lsh_launch(char **args) {
     if(pid == 0) {
         // Child process
         if (execvp(args[0], args) == -1) {
-            perrror("lsh");
+            perror("lsh");
         }
         exit(EXIT_FAILURE); // Exit child process if exec fails
     } else if (pid < 0) {
@@ -125,6 +125,24 @@ int lsh_launch(char **args) {
     }
 
     return 1;
+}
+
+// Contains a list of builtin commands
+char *builtin_str[] = {
+    "cd",
+    "help",
+    "exit"
+};
+
+// Command to map the builtin commands to their respective functions
+int (*builtin_func[]) (char **) = {
+    &lsh_cd,
+    &lsh_help,
+    &lsh_exit
+};
+
+int lsh_num_builtins() {
+    return sizeof(builtin_str) / sizeof(char *);
 }
 
 /**
@@ -148,24 +166,6 @@ int lsh_execute(char **args) {
 
     return lsh_launch(args); // If not a builtin command, launch it
 }
-
-
-
-
-
-// Contains a list of builtin commands
-char *builtin_str[] = {
-    "cd",
-    "help",
-    "exit"
-};
-
-// Command to map the builtin commands to their respective functions
-int (*builtin_func[]) (char **) = {
-    &lsh_cd,
-    &lsh_help,
-    &lsh_exit
-};
 
 /**
  * Builting shell function implementations

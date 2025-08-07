@@ -12,7 +12,7 @@
 // function declarations for the shell program
 void lsh_loop(void);
 char *lsh_read_line(void);
-char **lsh_splint_line(char *line);
+char **lsh_split_line(char *line);
 int lsh_launch(char **args);
 int lsh_execute(char **args);
 
